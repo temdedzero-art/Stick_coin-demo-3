@@ -13,7 +13,7 @@
         /* Стилізація елементів */
         .glass { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 14px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-size: 14px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
         .btn:active { transform: scale(0.98); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -28,7 +28,7 @@
 
         /* Рулетка */
         .r-wrap { position: relative; width: 200px; height: 200px; margin: 20px auto; }
-        .r-box { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #1a1a1a; transition: 5s cubic-bezier(0.1, 0, 0.1, 1); background: conic-gradient(var(--r) 0 170deg, var(--g) 170deg 19deg, #000 189deg); }
+        .r-box { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #1a1a1a; transition: 5s cubic-bezier(0.1, 0, 0.1, 1); background: conic-gradient(var(--r) 0 170deg, var(--g) 170deg); }
         .r-box.spin { transform: rotate(1800deg); }
         .r-wrap::after { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: var(--gold); font-size: 20px; z-index: 5; }
 
@@ -49,12 +49,12 @@
         .tab span { display: block; font-size: 8px; text-transform: uppercase; margin-top: 4px; }
 
         /* Майнінг */
-        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; }
         .orb:hover { transform: scale(1.05); }
         .orb.on { border-color: var(--r); animation: pulse 2s infinite; background: rgba(255, 51, 102, 0.1); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; cursor: pointer; transition: 0.2s; }
+        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; cursor: pointer; }
         .friend-item:hover { border-color: var(--p); }
         .friend-item button { width: 60px; padding: 8px; font-size: 11px; }
         .friend-item-avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--p); margin-right: 10px; }
@@ -77,7 +77,7 @@
 
         /* Вкладки реєстрації */
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 10px; background: #000; border: 1px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
+        .auth-tab { flex: 1; padding: 10px; background: #000; border: 1px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; }
         .auth-tab.active { background: var(--p); color: #000; border-color: var(--p); }
 
         .auth-form { display: none; }
@@ -287,8 +287,60 @@
 </div>
 
 <script>
-    // LocalStorage управління користувачами
-    let allUsers = JSON.parse(localStorage.getItem('stick_users')) || {};
+    // JSONBin конфіг
+    const JSONBIN_ID = '6a04f5aaadc21f119a979f14';
+    const JSONBIN_MASTER_KEY = '$2a$10$7yePq6PbDAjjMpk4.gfkWeIOrhlJpxaX7Io9/IM0FevWs37W5eaea';
+    const JSONBIN_API = 'https://api.jsonbin.io/v3/b/' + JSONBIN_ID;
+
+    // Завантаження користувачів з JSONBin
+    let allUsers = {};
+
+    async function loadAllUsers() {
+        try {
+            const response = await fetch(JSONBIN_API, {
+                method: 'GET',
+                headers: { 'X-Master-Key': JSONBIN_MASTER_KEY }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                allUsers = data.record || {};
+                console.log('✓ Дані завантажені з JSONBin');
+            } else {
+                console.log('Не вдалося завантажити дані з JSONBin, використовую локальне сховище');
+                allUsers = JSON.parse(localStorage.getItem('stick_users')) || {};
+            }
+        } catch (error) {
+            console.log('Помилка при завантаженні з JSONBin:', error);
+            allUsers = JSON.parse(localStorage.getItem('stick_users')) || {};
+        }
+    }
+
+    // Збереження користувачів у JSONBin
+    async function saveAllUsersToJsonBin() {
+        try {
+            const response = await fetch(JSONBIN_API, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_MASTER_KEY
+                },
+                body: JSON.stringify(allUsers)
+            });
+
+            if (response.ok) {
+                console.log('✓ Дані збережені у JSONBin');
+                // Також зберігаємо у localStorage як резервну копію
+                localStorage.setItem('stick_users', JSON.stringify(allUsers));
+            } else {
+                console.log('Помилка при збереженні у JSONBin, зберігаю локально');
+                localStorage.setItem('stick_users', JSON.stringify(allUsers));
+            }
+        } catch (error) {
+            console.log('Помилка при збереженні:', error);
+            localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        }
+    }
 
     // Глобальні змінні
     let gameState = {
@@ -355,7 +407,7 @@
             privateChatMessages: {}
         };
 
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        saveAllUsersToJsonBin();
         alert('Акаунт успішно створено! 🎉\nТепер ви можете увійти.');
         
         document.getElementById('reg-u').value = '';
@@ -429,11 +481,13 @@
                 }
                 gameState.balance += 0.0001;
                 updateHeader();
+                saveUserData();
             }, 1000);
         } else {
             btn.classList.remove('on');
             btn.textContent = 'START\nMINING';
             clearInterval(mineInterval);
+            saveUserData();
         }
     }
 
@@ -511,7 +565,7 @@
         allUsers[recipient].balance += amount;
 
         saveUserData();
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        saveAllUsersToJsonBin();
 
         alert(`✓ Успішно відправлено ${amount.toFixed(4)} STICK користувачу ${recipient}!`);
         document.getElementById('transfer-user').value = '';
@@ -588,7 +642,7 @@
         }
 
         allUsers[friendName].friendRequests.push(gameState.user);
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        saveAllUsersToJsonBin();
 
         alert(`✓ Запит на дружбу відправлено користувачу ${friendName}!`);
         document.getElementById('f-u').value = '';
@@ -633,7 +687,7 @@
         allUsers[friend].privateChatMessages[gameState.user] = allUsers[friend].privateChatMessages[gameState.user] || [];
 
         saveUserData();
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        saveAllUsersToJsonBin();
 
         updateFriendsList();
         updateFriendRequestsList();
@@ -643,6 +697,7 @@
     function rejectFriendRequest(idx) {
         gameState.friendRequests.splice(idx, 1);
         saveUserData();
+        saveAllUsersToJsonBin();
         updateFriendRequestsList();
     }
 
@@ -682,7 +737,7 @@
         }
 
         saveUserData();
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        saveAllUsersToJsonBin();
         updateFriendsList();
     }
 
@@ -747,7 +802,7 @@
         allUsers[gameState.currentChatFriend].privateChatMessages[gameState.user].push(message);
         
         saveUserData();
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        saveAllUsersToJsonBin();
 
         input.value = '';
         displayPrivateChat();
@@ -797,6 +852,7 @@
             
             updateHeader();
             saveUserData();
+            saveAllUsersToJsonBin();
             wheel.classList.remove('spin');
         }, 5000);
     }
@@ -869,6 +925,7 @@
         
         allUsers[gameState.user].avatar = avatarUrl;
         saveUserData();
+        saveAllUsersToJsonBin();
         
         alert('Конфіг збережено! ✓');
     }
@@ -912,7 +969,7 @@
 
         gameState.password = newPassword;
         allUsers[gameState.user].password = newPassword;
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        saveAllUsersToJsonBin();
 
         alert('Пароль успішно змінено! ✓');
         closeChangePasswordModal();
@@ -933,13 +990,13 @@
         allUsers[gameState.user].friends = gameState.friends;
         allUsers[gameState.user].friendRequests = gameState.friendRequests;
         allUsers[gameState.user].privateChatMessages = gameState.privateChatMessages;
-        localStorage.setItem('stick_users', JSON.stringify(allUsers));
     }
 
     // Вихід
     function logout() {
         if (confirm('Ви впевнені?')) {
             saveUserData();
+            saveAllUsersToJsonBin();
             
             if (mineInterval) clearInterval(mineInterval);
             
@@ -964,12 +1021,23 @@
     }
 
     // Ініціалізація
-    document.addEventListener('DOMContentLoaded', setupTicTacToe);
+    document.addEventListener('DOMContentLoaded', async () => {
+        setupTicTacToe();
+        await loadAllUsers();
+    });
 
     // Закриття модалі при натисканні на фон
     document.getElementById('change-password-modal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeChangePasswordModal();
+        }
+    });
+
+    // Автоматичне збереження при закритті вкладки
+    window.addEventListener('beforeunload', () => {
+        if (gameState.user) {
+            saveUserData();
+            saveAllUsersToJsonBin();
         }
     });
 </script>
