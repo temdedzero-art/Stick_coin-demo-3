@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STICK FARM PRO ONLINE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        :root { --p: #07FFFF; --bg: #030303; --card: #0d0d0d; --g: #00ff88; --r: #ff3366; --gold: #ffcc00; }
+        * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+        
+        .glass { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron'; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; }
+        .btn:hover { transform: scale(1.02); }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .header { padding: 15px 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #111; align-items: center; background: #000; }
+        .av { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--p); object-fit: cover; }
+
+        .view { flex: 1; padding: 20px; display: none; overflow-y: auto; padding-bottom: 90px; }
+        .view.active { display: block; animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; }
+        .orb:hover { transform: scale(1.05); }
+        .orb.on { border-color: var(--r); animation: pulse 2s infinite; background: rgba(255, 51, 102, 0.1); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); background: #000; border-top: 1px solid #111; padding: 12px 0 25px; z-index: 50; }
+        .tab { text-align: center; color: #444; font-size: 22px; cursor: pointer; transition: 0.2s; }
+        .tab.active { color: var(--p); }
+        .tab span { display: block; font-size: 8px; text-transform: uppercase; margin-top: 4px; }
+
+        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
+        .friend-item:hover { border-color: var(--p); }
+        .friend-item button { width: 60px; padding: 8px; font-size: 11px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid #222; max-width: 350px; width: 90%; }
+
+        .devices-list { background: #000; border: 1px solid #333; border-radius: 8px; padding: 10px; margin: 10px 0; }
+        .device-item { padding: 8px; border-bottom: 1px solid #222; font-size: 12px; color: #888; }
+        .device-item.mining { color: var(--g); font-weight: bold; }
+        .device-item::before { content: "📱 "; }
+        .device-item.mining::before { content: "⛏️ "; }
+        .device-item:last-child { border-bottom: none; }
+
+        @media (max-width: 480px) {
+            .view { padding: 15px; padding-bottom: 80px; }
+            input, select, .btn { padding: 11px; font-size: 13px; }
+            .orb { width: 140px; height: 140px; margin: 25px auto; font-size: 14px; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="auth-scr" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div class="glass" style="width:100%; max-width:320px; text-align:center;">
+        <h2 style="letter-spacing:5px; margin-bottom:30px; font-size:1.8rem;">STICK<span style="color:var(--p)">FARM</span></h2>
+        
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <button class="btn" id="tab-login" onclick="switchAuth('login')" style="background:var(--p); color:#000;">ВХІД</button>
+            <button class="btn" id="tab-register" onclick="switchAuth('register')" style="background:#222; color:#fff;">РЕЄСТР</button>
+        </div>
+
+        <div id="login-form">
+            <input type="text" id="login-u" placeholder="ЛОГІН">
+            <input type="password" id="login-p" placeholder="ПАРОЛЬ">
+            <button class="btn" onclick="auth('login')">УВІЙТИ</button>
+        </div>
+
+        <div id="register-form" style="display:none;">
+            <input type="text" id="reg-u" placeholder="ЛОГІН">
+            <input type="password" id="reg-p" placeholder="ПАРОЛЬ">
+            <input type="password" id="reg-p2" placeholder="ПОВТОРИТИ">
+            <button class="btn" onclick="auth('register')">РЕЄСТРАЦІЯ</button>
+        </div>
+    </div>
+</div>
+
+<div id="main-scr" style="display:none; flex-direction:column; height:100vh;">
+    <div class="header">
+        <div><small style="color:#555;">OPERATOR</small><br><b id="h-u">---</b></div>
+        <div style="text-align:right;"><small style="color:#555;">BALANCE</small><br><b id="h-b" style="color:var(--g);">0.0000</b></div>
+        <img id="h-a" class="av" src="" alt="avatar">
+    </div>
+
+    <div id="tab1" class="view active">
+        <h1 id="v-bal" style="text-align:center; font-size:3.5rem; margin:30px 0; font-weight:900;">0.0000</h1>
+        <div id="mbtn" class="orb" onclick="toggleMine()">START<br>MINING</div>
+        <div style="text-align:center; font-size:12px; color:#555; margin-bottom:20px;">+0.0001 STICK/сек<br>на кожен пристрій</div>
+        
+        <div class="glass" style="margin-top: 20px;">
+            <h3 style="margin-top: 0; color: var(--p); font-size: 14px;">📱 АКТИВНІ ПРИСТРОЇ</h3>
+            <div id="devices-list" class="devices-list" style="min-height: 60px;">
+                <div style="font-size: 12px; color: #888; text-align: center; padding: 10px;">завантаження...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab2" class="view">
+        <h3 style="color:var(--p); margin-top:0;">💳 TRANSFER</h3>
+        <div class="glass">
+            <input type="text" id="transfer-user" placeholder="Логін отримувача">
+            <input type="number" id="transfer-amount" placeholder="0.0000" min="0.0001" step="0.0001">
+            <button class="btn" onclick="transferCoins()">ВІДПРАВИТИ</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="view">
+        <h3 style="margin-top:0;">🎰 CASINO</h3>
+        <div class="glass" style="text-align:center;">
+            <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
+            <div style="display:flex; gap:5px;">
+                <button class="btn" style="background:var(--r); color:#fff;" onclick="spin('red')">RED</button>
+                <button class="btn" style="background:#111; border:1px solid #333; color:#fff;" onclick="spin('black')">BLACK</button>
+                <button class="btn" style="background:var(--g); color:#000;" onclick="spin('green')">0</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab4" class="view">
+        <h3 style="margin-top:0;">👥 ДРУЗІ</h3>
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="f-u" placeholder="Логін...">
+            <button class="btn" style="width:80px;" onclick="sendFriendRequest()">ADD</button>
+        </div>
+        <h3 style="margin-top:20px; color:var(--g);">ЗАПИТИ</h3>
+        <div id="f-requests"></div>
+        <h3 style="margin-top:20px; color:var(--g);">МОЇ ДРУЗІ</h3>
+        <div id="f-list"></div>
+    </div>
+
+    <div id="tab5" class="view">
+        <h3>⚙️ CONFIG</h3>
+        <div class="glass">
+            <label style="font-size:10px; color:var(--p);">НАЗВА ПРИСТРОЮ</label>
+            <input type="text" id="device-name" placeholder="e.g. iPhone, PC">
+            <label style="font-size:10px; color:var(--p); margin-top:15px;">АВАТАР URL</label>
+            <input type="text" id="avatar-url" placeholder="https://...">
+            <button class="btn" onclick="saveConfig()" style="margin-top:15px;">ЗБЕРЕГТИ</button>
+            <button class="btn" onclick="logout()" style="background:var(--r); color:#fff; margin-top:10px;">ВИХІД</button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="tab active" onclick="switchTab(1)">⛏️<span>Mining</span></div>
+        <div class="tab" onclick="switchTab(2)">💳<span>Transfer</span></div>
+        <div class="tab" onclick="switchTab(3)">🎰<span>Casino</span></div>
+        <div class="tab" onclick="switchTab(4)">👥<span>Friends</span></div>
+        <div class="tab" onclick="switchTab(5)">⚙️<span>Config</span></div>
+    </nav>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000';
+    let socket = null;
+    let gameState = {
+        user: null,
+        token: null,
+        balance: 0,
+        mining: false,
+        deviceName: 'Device_' + Math.random().toString(36).substr(2, 9),
+        friends: [],
+        friendRequests: []
+    };
+
+    function switchAuth(type) {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+
+        if (type === 'login') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            tabLogin.style.background = 'var(--p)';
+            tabLogin.style.color = '#000';
+            tabRegister.style.background = '#222';
+            tabRegister.style.color = '#fff';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            tabLogin.style.background = '#222';
+            tabLogin.style.color = '#fff';
+            tabRegister.style.background = 'var(--p)';
+            tabRegister.style.color = '#000';
+        }
+    }
+
+    async function auth(type) {
+        const username = document.getElementById(type === 'login' ? 'login-u' : 'reg-u').value.trim();
+        const password = document.getElementById(type === 'login' ? 'login-p' : 'reg-p').value;
+
+        if (!username || !password) {
+            alert('Заповніть усі поля!');
+            return;
+        }
+
+        if (type === 'register') {
+            const passwordConfirm = document.getElementById('reg-p2').value;
+            if (password !== passwordConfirm) {
+                alert('Паролі не співпадають!');
+                return;
+            }
+        }
+
+        try {
+            const endpoint = type === 'register' ? '/api/register' : '/api/login';
+            const res = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Помилка');
+                return;
+            }
+
+            gameState.user = data.username;
+            gameState.token = data.token;
+            gameState.balance = data.balance || 0;
+
+            connectSocket();
+            showMainScreen();
+
+        } catch (err) {
+            alert('Помилка: ' + err.message);
+        }
+    }
+
+    function connectSocket() {
+        socket = io(API_URL);
+
+        socket.on('connect', () => {
+            console.log('✓ WebSocket підключений');
+            socket.emit('authenticate', {
+                token: gameState.token,
+                deviceName: gameState.deviceName
+            });
+        });
+
+        socket.on('auth_success', (data) => {
+            console.log('✓ Автентифіковано:', data.username);
+        });
+
+        socket.on('balance_update', (data) => {
+            gameState.balance = data.balance;
+            updateHeader();
+        });
+
+        socket.on('device_list_update', (devices) => {
+            updateDevicesList(devices);
+        });
+
+        socket.on('friend_request_received', (data) => {
+            gameState.friendRequests.push(data.from);
+            updateFriendRequestsList();
+        });
+
+        socket.on('friend_list_update', (friends) => {
+            gameState.friends = friends;
+            updateFriendsList();
+        });
+
+        socket.on('transfer_success', (data) => {
+            alert(`✓ Надіслано ${data.amount.toFixed(4)} STICK користувачу ${data.recipient}`);
+            document.getElementById('transfer-user').value = '';
+            document.getElementById('transfer-amount').value = '';
+        });
+
+        socket.on('spin_result', (data) => {
+            if (data.won) {
+                alert(`🎉 ВИ ВИГРАЛИ ${data.winAmount.toFixed(4)} STICK!`);
+            } else {
+                alert(`❌ Ви програли ставку`);
+            }
+        });
+
+        socket.on('error', (data) => {
+            alert('⚠️ ' + data.error);
+        });
+
+        socket.on('success', (data) => {
+            alert('✓ ' + data.message);
+        });
+    }
+
+    function updateHeader() {
+        document.getElementById('h-u').textContent = gameState.user || '---';
+        document.getElementById('h-b').textContent = gameState.balance.toFixed(4);
+        document.getElementById('v-bal').textContent = gameState.balance.toFixed(4);
+    }
+
+    function updateDevicesList(devices) {
+        const listDiv = document.getElementById('devices-list');
+        if (!devices || devices.length === 0) {
+            listDiv.innerHTML = '<div style="font-size:12px; color:#888; text-align:center; padding:10px;">немає активних пристроїв</div>';
+            return;
+        }
+        listDiv.innerHTML = devices.map(d => `
+            <div class="device-item ${d.mining ? 'mining' : ''}">
+                ${d.name} ${d.mining ? '(майнить...)' : ''}
+            </div>
+        `).join('');
+    }
+
+    function toggleMine() {
+        const btn = document.getElementById('mbtn');
+        gameState.mining = !gameState.mining;
+
+        if (gameState.mining) {
+            btn.classList.add('on');
+            btn.textContent = 'MINING...';
+            socket.emit('start_mining');
+        } else {
+            btn.classList.remove('on');
+            btn.textContent = 'START\nMINING';
+            socket.emit('stop_mining');
+        }
+    }
+
+    function transferCoins() {
+        const recipient = document.getElementById('transfer-user').value.trim();
+        const amount = parseFloat(document.getElementById('transfer-amount').value);
+
+        if (!recipient || !amount || amount <= 0) {
+            alert('Введіть дані!');
+            return;
+        }
+
+        socket.emit('transfer_coins', { recipient, amount });
+    }
+
+    function sendFriendRequest() {
+        const friendName = document.getElementById('f-u').value.trim();
+        if (!friendName) {
+            alert('Введіть логін!');
+            return;
+        }
+        socket.emit('send_friend_request', { friendName });
+        document.getElementById('f-u').value = '';
+    }
+
+    function updateFriendRequestsList() {
+        const div = document.getElementById('f-requests');
+        if (gameState.friendRequests.length === 0) {
+            div.innerHTML = '<p style="font-size:11px; color:#555;">немає запитів</p>';
+            return;
+        }
+        div.innerHTML = gameState.friendRequests.map((friend, idx) => `
+            <div class="friend-item">
+                <span>${friend}</span>
+                <button class="btn" onclick="acceptFriend('${friend}')" style="width:50px; padding:6px; background:var(--g); color:#000; font-size:10px;">✓</button>
+            </div>
+        `).join('');
+    }
+
+    function acceptFriend(friendName) {
+        socket.emit('accept_friend_request', { friendName });
+        gameState.friendRequests = gameState.friendRequests.filter(f => f !== friendName);
+        updateFriendRequestsList();
+    }
+
+    function updateFriendsList() {
+        const div = document.getElementById('f-list');
+        if (gameState.friends.length === 0) {
+            div.innerHTML = '<p style="font-size:11px; color:#555;">немає друзів</p>';
+            return;
+        }
+        div.innerHTML = gameState.friends.map(friend => `
+            <div class="friend-item">
+                <span>${friend}</span>
+            </div>
+        `).join('');
+    }
+
+    function spin(color) {
+        const betAmount = parseFloat(document.getElementById('bet-amt').value);
+        if (!betAmount || betAmount <= 0) {
+            alert('Введіть ставку!');
+            return;
+        }
+        socket.emit('spin_wheel', { betAmount, color });
+    }
+
+    function saveConfig() {
+        const newDeviceName = document.getElementById('device-name').value.trim();
+        if (newDeviceName) {
+            gameState.deviceName = newDeviceName;
+        }
+        alert('⚙️ Конфіг збережено!');
+    }
+
+    function switchTab(tabNum) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab' + tabNum).classList.add('active');
+        document.querySelectorAll('.tab')[tabNum - 1].classList.add('active');
+    }
+
+    function showMainScreen() {
+        document.getElementById('auth-scr').style.display = 'none';
+        document.getElementById('main-scr').style.display = 'flex';
+        document.getElementById('h-a').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${gameState.user}`;
+        document.getElementById('device-name').value = gameState.deviceName;
+        updateHeader();
+        updateFriendRequestsList();
+        updateFriendsList();
+    }
+
+    function logout() {
+        if (confirm('Ви впевнені?')) {
+            if (socket) socket.disconnect();
+            gameState = { user: null, token: null, balance: 0, mining: false };
+            document.getElementById('main-scr').style.display = 'none';
+            document.getElementById('auth-scr').style.display = 'flex';
+            document.getElementById('login-u').value = '';
+            document.getElementById('login-p').value = '';
+        }
+    }
+</script>
+
+</body>
+</html>
