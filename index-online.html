@@ -12,7 +12,7 @@
         body { background: var(--bg); color: #fff; margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
         
         .glass { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron'; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron'; }
         .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; }
         .btn:hover { transform: scale(1.02); }
         .btn:active { transform: scale(0.98); }
@@ -25,7 +25,7 @@
         .view.active { display: block; animation: fade 0.3s ease; }
         @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
-        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; }
+        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .orb:hover { transform: scale(1.05); }
         .orb.on { border-color: var(--r); animation: pulse 2s infinite; background: rgba(255, 51, 102, 0.1); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
@@ -50,15 +50,29 @@
         .device-item.mining::before { content: "⛏️ "; }
         .device-item:last-child { border-bottom: none; }
 
+        .notification-item { background: #000; padding: 10px; border-left: 3px solid var(--g); border-radius: 4px; margin: 8px 0; font-size: 12px; color: #ccc; }
+        .notification-item.error { border-left-color: var(--r); }
+        .notification-item.warning { border-left-color: var(--gold); }
+
+        .avatar-picker { display: flex; gap: 10px; margin: 10px 0; align-items: center; flex-wrap: wrap; }
+        .avatar-preview { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--p); background: #000; object-fit: cover; }
+        #avatar-file { display: none; }
+
+        .internet-status { position: fixed; top: 0; left: 0; right: 0; padding: 10px; text-align: center; font-size: 12px; z-index: 200; }
+        .internet-status.offline { background: var(--r); color: #fff; }
+        .internet-status.online { background: var(--g); color: #000; }
+
         @media (max-width: 480px) {
             .view { padding: 15px; padding-bottom: 80px; }
-            input, select, .btn { padding: 11px; font-size: 13px; }
+            input, select, textarea, .btn { padding: 11px; font-size: 13px; }
             .orb { width: 140px; height: 140px; margin: 25px auto; font-size: 14px; }
             h1 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
+
+<div class="internet-status" id="internet-status" style="display: none;"></div>
 
 <div id="auth-scr" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
     <div class="glass" style="width:100%; max-width:320px; text-align:center;">
@@ -109,6 +123,7 @@
         <div class="glass">
             <input type="text" id="transfer-user" placeholder="Логін отримувача">
             <input type="number" id="transfer-amount" placeholder="0.0000" min="0.0001" step="0.0001">
+            <textarea id="transfer-message" placeholder="Повідомлення (опціонально)" style="height: 60px; resize: none;"></textarea>
             <button class="btn" onclick="transferCoins()">ВІДПРАВИТИ</button>
         </div>
     </div>
@@ -139,14 +154,31 @@
 
     <div id="tab5" class="view">
         <h3>⚙️ CONFIG</h3>
+        
+        <h4 style="margin-top: 20px; color: var(--p); font-size: 12px;">📱 ПРИСТРОЇ</h4>
         <div class="glass">
-            <label style="font-size:10px; color:var(--p);">НАЗВА ПРИСТРОЮ</label>
+            <label style="font-size:10px; color:var(--p);">НАЗВА НОВОГО ПРИСТРОЮ</label>
             <input type="text" id="device-name" placeholder="e.g. iPhone, PC">
-            <label style="font-size:10px; color:var(--p); margin-top:15px;">АВАТАР URL</label>
-            <input type="text" id="avatar-url" placeholder="https://...">
-            <button class="btn" onclick="saveConfig()" style="margin-top:15px;">ЗБЕРЕГТИ</button>
-            <button class="btn" onclick="logout()" style="background:var(--r); color:#fff; margin-top:10px;">ВИХІД</button>
+            <button class="btn" onclick="registerDevice()" style="margin-top:10px; background: var(--g); color: #000;">+ ДОДАТИ ПРИСТРІЙ</button>
+            <div id="devices-config" style="margin-top: 15px;"></div>
         </div>
+
+        <h4 style="margin-top: 20px; color: var(--p); font-size: 12px;">🖼️ АВАТАР</h4>
+        <div class="glass">
+            <div class="avatar-picker">
+                <img id="avatar-preview" class="avatar-preview" src="" alt="avatar">
+                <button class="btn" style="flex: 1;" onclick="document.getElementById('avatar-file').click()">ВИБРАТИ З ГАЛЕРЕЇ</button>
+                <input type="file" id="avatar-file" accept="image/*">
+            </div>
+            <button class="btn" onclick="saveAvatarConfig()" style="margin-top:10px;">ЗБЕРЕГТИ</button>
+        </div>
+
+        <h4 style="margin-top: 20px; color: var(--p); font-size: 12px;">🔔 СПОВІЩЕННЯ</h4>
+        <div id="notifications-container" class="glass" style="max-height: 200px; overflow-y: auto; min-height: 100px;">
+            <div style="font-size: 12px; color: #555; text-align: center; padding: 20px;">сповіщень немає</div>
+        </div>
+
+        <button class="btn" onclick="logout()" style="background:var(--r); color:#fff; margin-top:20px;">ВИХІД</button>
     </div>
 
     <nav>
@@ -167,9 +199,59 @@
         balance: 0,
         mining: false,
         deviceName: 'Device_' + Math.random().toString(36).substr(2, 9),
+        deviceId: null,
+        devices: [],
         friends: [],
-        friendRequests: []
+        friendRequests: [],
+        notifications: [],
+        avatarData: null,
+        isOnline: navigator.onLine
     };
+
+    // Перевірка інтернету
+    function checkInternet() {
+        const status = navigator.onLine;
+        gameState.isOnline = status;
+        const statusDiv = document.getElementById('internet-status');
+        
+        if (status) {
+            statusDiv.textContent = '✓ Інтернет підключено';
+            statusDiv.className = 'internet-status online';
+        } else {
+            statusDiv.textContent = '✗ НЕМАЄ ІНТЕРНЕТУ! Не можливо з\'єднати з сервером';
+            statusDiv.className = 'internet-status offline';
+            statusDiv.style.display = 'block';
+        }
+        
+        statusDiv.style.display = status ? 'none' : 'block';
+    }
+
+    window.addEventListener('online', checkInternet);
+    window.addEventListener('offline', checkInternet);
+    checkInternet();
+
+    // Сповіщення
+    function addNotification(message, type = 'success') {
+        const notification = { id: Date.now(), message, type, time: new Date().toLocaleTimeString() };
+        gameState.notifications.unshift(notification);
+        if (gameState.notifications.length > 20) gameState.notifications.pop();
+        updateNotifications();
+    }
+
+    function updateNotifications() {
+        const container = document.getElementById('notifications-container');
+        if (gameState.notifications.length === 0) {
+            container.innerHTML = '<div style="font-size: 12px; color: #555; text-align: center; padding: 20px;">сповіщень немає</div>';
+            return;
+        }
+        container.innerHTML = gameState.notifications.map(n => `
+            <div class="notification-item ${n.type}">
+                <span style="color: #555; font-size: 10px;">[${n.time}]</span><br>
+                ${n.message}
+            </div>
+        `).join('');
+        container.scrollTop = 0;
+    }
 
     function switchAuth(type) {
         const loginForm = document.getElementById('login-form');
@@ -195,6 +277,11 @@
     }
 
     async function auth(type) {
+        if (!gameState.isOnline) {
+            alert('❌ НЕМАЄ ІНТЕРНЕТУ! Не можливо з\'єднати з сервером');
+            return;
+        }
+
         const username = document.getElementById(type === 'login' ? 'login-u' : 'reg-u').value.trim();
         const password = document.getElementById(type === 'login' ? 'login-p' : 'reg-p').value;
 
@@ -229,41 +316,57 @@
             gameState.user = data.username;
             gameState.token = data.token;
             gameState.balance = data.balance || 0;
+            gameState.deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
 
             connectSocket();
             showMainScreen();
 
         } catch (err) {
-            alert('Помилка: ' + err.message);
+            alert('❌ Помилка з\'єднання: ' + err.message);
         }
     }
 
     function connectSocket() {
+        if (!gameState.isOnline) {
+            addNotification('❌ Немає інтернету', 'error');
+            return;
+        }
+
         socket = io(API_URL);
 
         socket.on('connect', () => {
             console.log('✓ WebSocket підключений');
+            addNotification('✓ Підключено до сервера', 'success');
             socket.emit('authenticate', {
                 token: gameState.token,
-                deviceName: gameState.deviceName
+                deviceName: gameState.deviceName,
+                deviceId: gameState.deviceId
             });
         });
 
         socket.on('auth_success', (data) => {
             console.log('✓ Автентифіковано:', data.username);
+            gameState.devices = data.devices || [];
+            updateDevicesConfig();
+            updateDevicesList(gameState.devices);
         });
 
         socket.on('balance_update', (data) => {
             gameState.balance = data.balance;
+            addNotification(`💰 Баланс оновлено: +${data.income?.toFixed(4) || 0} STICK`, 'success');
             updateHeader();
         });
 
         socket.on('device_list_update', (devices) => {
+            gameState.devices = devices;
             updateDevicesList(devices);
+            updateDevicesConfig();
+            addNotification(`📱 Оновлення пристроїв: ${devices.length} активних`, 'success');
         });
 
         socket.on('friend_request_received', (data) => {
             gameState.friendRequests.push(data.from);
+            addNotification(`👥 Запит дружби від ${data.from}`, 'success');
             updateFriendRequestsList();
         });
 
@@ -273,25 +376,44 @@
         });
 
         socket.on('transfer_success', (data) => {
-            alert(`✓ Надіслано ${data.amount.toFixed(4)} STICK користувачу ${data.recipient}`);
+            addNotification(`✓ Надіслано ${data.amount.toFixed(4)} STICK користувачу ${data.recipient}`, 'success');
             document.getElementById('transfer-user').value = '';
             document.getElementById('transfer-amount').value = '';
+            document.getElementById('transfer-message').value = '';
+        });
+
+        socket.on('transfer_received', (data) => {
+            addNotification(`💰 Отримано ${data.amount.toFixed(4)} STICK від ${data.sender}${data.message ? ': ' + data.message : ''}`, 'success');
+            gameState.balance = data.newBalance;
+            updateHeader();
         });
 
         socket.on('spin_result', (data) => {
             if (data.won) {
-                alert(`🎉 ВИ ВИГРАЛИ ${data.winAmount.toFixed(4)} STICK!`);
+                addNotification(`🎉 ВИ ВИГРАЛИ ${data.winAmount.toFixed(4)} STICK!`, 'success');
             } else {
-                alert(`❌ Ви програли ставку`);
+                addNotification(`❌ Ви програли ставку`, 'error');
             }
+            gameState.balance = data.newBalance;
+            updateHeader();
+        });
+
+        socket.on('mining_income', (data) => {
+            gameState.balance = data.newBalance;
+            addNotification(`⛏️ Дохід з ${data.deviceName}: +${data.income.toFixed(4)} STICK`, 'success');
+            updateHeader();
         });
 
         socket.on('error', (data) => {
-            alert('⚠️ ' + data.error);
+            addNotification('⚠️ ' + data.error, 'error');
         });
 
         socket.on('success', (data) => {
-            alert('✓ ' + data.message);
+            addNotification('✓ ' + data.message, 'success');
+        });
+
+        socket.on('disconnect', () => {
+            addNotification('⚠️ Розірвано з\'єднання', 'warning');
         });
     }
 
@@ -309,36 +431,84 @@
         }
         listDiv.innerHTML = devices.map(d => `
             <div class="device-item ${d.mining ? 'mining' : ''}">
-                ${d.name} ${d.mining ? '(майнить...)' : ''}
+                ${d.name} ${d.mining ? '(майнить...)' : ''} 
+                <span style="color: #555; font-size: 10px;">(+${(0.0001 * (d.mining ? 1 : 0)).toFixed(4)} STICK/s)</span>
             </div>
         `).join('');
     }
 
+    function updateDevicesConfig() {
+        const container = document.getElementById('devices-config');
+        if (gameState.devices.length === 0) {
+            container.innerHTML = '<div style="font-size: 12px; color: #555; text-align: center; padding: 10px;">немає привязаних пристроїв</div>';
+            return;
+        }
+        container.innerHTML = gameState.devices.map((d, idx) => `
+            <div style="padding: 8px; background: #000; border-left: 2px solid ${d.mining ? 'var(--g)' : '#333'}; margin: 5px 0; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                    <span>${d.name} ${d.mining ? '⛏️ MINING' : '📱'}</span>
+                    <button class="btn" style="width: 60px; padding: 6px; background: var(--r); color: #fff; font-size: 10px;" onclick="removeDevice('${d.id}')">ВИДАЛИТИ</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function registerDevice() {
+        const name = document.getElementById('device-name').value.trim();
+        if (!name) {
+            alert('Введіть назву пристрою!');
+            return;
+        }
+        socket.emit('register_device', { name });
+        document.getElementById('device-name').value = '';
+        addNotification(`📱 Пристрій "${name}" додано`, 'success');
+    }
+
+    function removeDevice(deviceId) {
+        if (confirm('Ви впевнені?')) {
+            socket.emit('remove_device', { deviceId });
+            addNotification('📱 Пристрій видалено', 'success');
+        }
+    }
+
     function toggleMine() {
+        if (!gameState.isOnline) {
+            addNotification('❌ Немає інтернету', 'error');
+            return;
+        }
+
         const btn = document.getElementById('mbtn');
         gameState.mining = !gameState.mining;
 
         if (gameState.mining) {
             btn.classList.add('on');
             btn.textContent = 'MINING...';
-            socket.emit('start_mining');
+            socket.emit('start_mining', { deviceId: gameState.deviceId });
+            addNotification('⛏️ Майнинг розпочато', 'success');
         } else {
             btn.classList.remove('on');
             btn.textContent = 'START\nMINING';
-            socket.emit('stop_mining');
+            socket.emit('stop_mining', { deviceId: gameState.deviceId });
+            addNotification('⛏️ Майнинг зупинено', 'success');
         }
     }
 
     function transferCoins() {
+        if (!gameState.isOnline) {
+            addNotification('❌ Немає інтернету', 'error');
+            return;
+        }
+
         const recipient = document.getElementById('transfer-user').value.trim();
         const amount = parseFloat(document.getElementById('transfer-amount').value);
+        const message = document.getElementById('transfer-message').value.trim();
 
         if (!recipient || !amount || amount <= 0) {
             alert('Введіть дані!');
             return;
         }
 
-        socket.emit('transfer_coins', { recipient, amount });
+        socket.emit('transfer_coins', { recipient, amount, message });
     }
 
     function sendFriendRequest() {
@@ -385,6 +555,11 @@
     }
 
     function spin(color) {
+        if (!gameState.isOnline) {
+            addNotification('❌ Немає інтернету', 'error');
+            return;
+        }
+
         const betAmount = parseFloat(document.getElementById('bet-amt').value);
         if (!betAmount || betAmount <= 0) {
             alert('Введіть ставку!');
@@ -393,12 +568,27 @@
         socket.emit('spin_wheel', { betAmount, color });
     }
 
-    function saveConfig() {
-        const newDeviceName = document.getElementById('device-name').value.trim();
-        if (newDeviceName) {
-            gameState.deviceName = newDeviceName;
+    // Аватар з галереї
+    document.getElementById('avatar-file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                gameState.avatarData = event.target.result;
+                document.getElementById('avatar-preview').src = gameState.avatarData;
+                addNotification('🖼️ Аватар завантажено', 'success');
+            };
+            reader.readAsDataURL(file);
         }
-        alert('⚙️ Конфіг збережено!');
+    });
+
+    function saveAvatarConfig() {
+        if (gameState.avatarData) {
+            socket.emit('save_avatar', { avatarData: gameState.avatarData });
+            addNotification('🖼️ Аватар збережено', 'success');
+        } else {
+            alert('Виберіть аватар!');
+        }
     }
 
     function switchTab(tabNum) {
@@ -411,17 +601,24 @@
     function showMainScreen() {
         document.getElementById('auth-scr').style.display = 'none';
         document.getElementById('main-scr').style.display = 'flex';
-        document.getElementById('h-a').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${gameState.user}`;
+        const avatarUrl = gameState.avatarData || `https://api.dicebear.com/7.x/avataaars/svg?seed=${gameState.user}`;
+        document.getElementById('h-a').src = avatarUrl;
+        document.getElementById('avatar-preview').src = avatarUrl;
         document.getElementById('device-name').value = gameState.deviceName;
         updateHeader();
+        updateNotifications();
         updateFriendRequestsList();
         updateFriendsList();
+        updateDevicesConfig();
     }
 
     function logout() {
         if (confirm('Ви впевнені?')) {
             if (socket) socket.disconnect();
-            gameState = { user: null, token: null, balance: 0, mining: false };
+            gameState = { 
+                user: null, token: null, balance: 0, mining: false, 
+                devices: [], notifications: [], isOnline: navigator.onLine 
+            };
             document.getElementById('main-scr').style.display = 'none';
             document.getElementById('auth-scr').style.display = 'flex';
             document.getElementById('login-u').value = '';
