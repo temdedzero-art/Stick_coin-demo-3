@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <!-- СИЛОВА ОЧИСТКА КЕШУ - v2026051620240001 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>STICK FARM PRO ULTRA</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
@@ -13,76 +15,60 @@
         * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #fff; margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
         
-        /* Стилізація елементів */
         .glass { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 14px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-size: 13px; transition: 0.2s; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; transition: all 0.2s; }
         .btn:hover { transform: scale(1.02); }
         .btn:active { transform: scale(0.98); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Шапка */
         .header { padding: 15px 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #111; align-items: center; background: #000; z-index: 40; }
         .av { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--p); object-fit: cover; background: #1a1a1a; }
 
-        /* Вкладки */
         .view { flex: 1; padding: 15px; display: none; overflow-y: auto; padding-bottom: 100px; }
         .view.active { display: block; animation: fade 0.3s ease; }
         @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Рулетка */
         .r-wrap { position: relative; width: 200px; height: 200px; margin: 20px auto; }
-        .r-box { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #1a1a1a; transition: 5s cubic-bezier(0.1, 0, 0.1, 1); background: conic-gradient(var(--r) 0 35%, var(--black) 35% 72%, var(--g) 72%); }
+        .r-box { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #1a1a1a; transition: 0.8s cubic-bezier(0.1, 0, 0.1, 1); background: conic-gradient(var(--r) 0 172.8deg, #111 172.8deg 259.2deg, var(--g) 259.2deg 360deg); }
         .r-box.spin { transform: rotate(3600deg); }
         .r-wrap::after { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: var(--gold); font-size: 20px; z-index: 5; }
 
-        /* Хрестики-Нолики */
         .ttt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 210px; margin: 15px auto; }
         .c { aspect-ratio: 1; background: #000; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 5px; cursor: pointer; }
         .c:hover { border-color: var(--p); }
 
-        /* Навігація */
         nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); background: #000; border-top: 1px solid #111; padding: 12px 0 25px; z-index: 50; }
         .tab { text-align: center; color: #444; font-size: 22px; cursor: pointer; transition: 0.2s; }
         .tab.active { color: var(--p); }
         .tab span { display: block; font-size: 8px; text-transform: uppercase; margin-top: 4px; }
 
-        /* Майнінг */
-        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; text-align: center; }
         .orb:hover { transform: scale(1.05); }
         .orb.on { border-color: var(--r); animation: pulse 2s infinite; background: rgba(255, 51, 102, 0.1); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; cursor: pointer; }
+        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
         .friend-item:hover { border-color: var(--p); }
         .friend-item button { width: 60px; padding: 8px; font-size: 11px; }
         .friend-item-avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--p); margin-right: 10px; }
 
-        /* Список пошуку користувачів */
         .user-search-results { background: #000; border: 1px solid #333; border-radius: 8px; max-height: 150px; overflow-y: auto; margin-top: 10px; }
-        .user-result { padding: 10px; border-bottom: 1px solid #222; display: flex; align-items: center; cursor: pointer; transition: 0.2s; }
+        .user-result { padding: 10px; border-bottom: 1px solid #222; display: flex; align-items: center; cursor: pointer; }
         .user-result:hover { background: #0a0a0a; border-left: 3px solid var(--p); }
         .user-result img { width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; }
-        .user-result-name { flex: 1; font-size: 12px; }
 
-        /* Модальні стилі */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid #222; max-width: 350px; width: 90%; }
         .modal-content h2 { margin-top: 0; color: var(--p); }
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; padding: 12px; }
-        .btn-group .btn-secondary { background: #222; color: #fff; border: 1px solid #333; }
 
-        /* Вкладки реєстрації */
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 10px; background: #000; border: 1px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
+        .auth-tab { flex: 1; padding: 10px; background: #000; border: 1px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; }
         .auth-tab.active { background: var(--p); color: #000; border-color: var(--p); }
 
-        .auth-form { display: none; }
-        .auth-form.active { display: block; }
-
-        /* Чати з друзями */
         .chat-container { display: flex; flex-direction: column; height: 100%; }
         .chat-header { display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
         .chat-header img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; border: 2px solid var(--p); }
@@ -100,11 +86,9 @@
         .chat-input-wrapper input { flex: 1; }
         .chat-input-wrapper button { width: 70px; }
 
-        /* Кнопки казино */
         .casino-buttons { display: flex; gap: 5px; margin-top: 10px; }
         .casino-buttons .btn { flex: 1; }
 
-        /* Адаптивність */
         @media (max-width: 480px) {
             body { font-size: 14px; }
             .header { padding: 12px 15px; }
@@ -161,7 +145,7 @@
             <button class="btn" onclick="auth()">УВІЙТИ</button>
         </div>
 
-        <div id="register-form" class="auth-form">
+        <div id="register-form" class="auth-form" style="display:none;">
             <input type="text" id="reg-u" placeholder="ЛОГІН">
             <input type="password" id="reg-p" placeholder="ПАРОЛЬ">
             <input type="password" id="reg-p2" placeholder="ПОВТОРИТИ ПАРОЛЬ">
@@ -239,7 +223,7 @@
         <div id="f-list" style="margin-top:10px;"></div>
     </div>
 
-    <div id="tab4-chat" class="view">
+    <div id="tab4-chat" class="view" style="display:none;">
         <div class="chat-container">
             <div class="chat-header">
                 <span class="chat-header-back" onclick="backToFriendsList()">◀ НАЗАД</span>
@@ -264,7 +248,7 @@
         <div class="tab" onclick="switchTab(5)">⚙️<span>Config</span></div>
     </nav>
 
-    <div id="tab5" class="view">
+    <div id="tab5" class="view" style="display:none;">
         <h3>OS CONFIG</h3>
         <div class="glass">
             <label style="font-size:10px; color:var(--p);">AVATAR URL</label>
@@ -272,32 +256,7 @@
             <label style="font-size:10px; color:var(--p); margin-top:15px;">USERNAME</label>
             <input type="text" id="username-cfg" placeholder="Ваше імя">
             <button class="btn" onclick="saveConfig()" style="margin-top:15px;">ЗБЕРЕГТИ</button>
-            <button class="btn" onclick="openChangePasswordModal()" style="background:var(--gold); color:#000; margin-top:10px;">ЗМІНИТИ ПАРОЛЬ</button>
             <button class="btn" onclick="logout()" style="background:var(--r); color:#fff; margin-top:10px;">ВИХІД</button>
-        </div>
-    </div>
-</div>
-
-<div id="change-password-modal" class="modal">
-    <div class="modal-content">
-        <h2>ЗМІНИТИ ПАРОЛЬ</h2>
-        <input type="password" id="old-password" placeholder="СТАРИЙ ПАРОЛЬ">
-        <input type="password" id="new-password" placeholder="НОВИЙ ПАРОЛЬ">
-        <input type="password" id="new-password-confirm" placeholder="ПОВТОРИТИ ПАРОЛЬ">
-        <div class="btn-group">
-            <button class="btn" onclick="changePassword()">ЗМІНИТИ</button>
-            <button class="btn btn-secondary" onclick="closeChangePasswordModal()">СКАСУВАТИ</button>
-        </div>
-    </div>
-</div>
-
-<div id="ttt-request-modal" class="modal">
-    <div class="modal-content">
-        <h2 id="ttt-request-text">ХОТ.ВИКЛИКАЄ ВАС!</h2>
-        <p id="ttt-bet-text" style="color:var(--p); text-align:center; font-size:14px;"></p>
-        <div class="btn-group">
-            <button class="btn" style="background:var(--g); color:#000;" onclick="acceptTTTChallenge()">ПРИЙНЯТИ</button>
-            <button class="btn btn-secondary" onclick="rejectTTTChallenge()">ВІДХИЛИТИ</button>
         </div>
     </div>
 </div>
@@ -370,7 +329,10 @@
 
     let mineInterval = null;
 
-    // Відновлення майнінгу при завантаженні
+    window.addEventListener('load', async () => {
+        await loadAllUsers();
+    });
+
     function resumeMining() {
         if (gameState.miningStartTime && gameState.mining) {
             const timePassed = Math.floor((Date.now() - gameState.miningStartTime) / 1000);
@@ -383,14 +345,14 @@
     }
 
     function switchAuth(type) {
-        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
         if (type === 'login') {
-            document.getElementById('login-form').classList.add('active');
-            document.querySelectorAll('.auth-tab')[0].classList.add('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
         } else {
-            document.getElementById('register-form').classList.add('active');
-            document.querySelectorAll('.auth-tab')[1].classList.add('active');
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
         }
     }
 
@@ -407,10 +369,6 @@
             alert('Паролі не співпадають!');
             return;
         }
-        if (password.length < 4) {
-            alert('Пароль повинен бути не менше 4 символів!');
-            return;
-        }
         if (allUsers[username]) {
             alert('Цей користувач вже зареєстрований!');
             return;
@@ -423,13 +381,12 @@
             friends: [],
             friendRequests: [],
             privateChatMessages: {},
-            tttRequests: [],
             mining: false,
             miningStartTime: 0
         };
 
         saveAllUsersToJsonBin();
-        alert('Акаунт успішно створено! 🎉\nТепер ви можете увійти.');
+        alert('Акаунт успішно створено! 🎉');
         document.getElementById('reg-u').value = '';
         document.getElementById('reg-p').value = '';
         document.getElementById('reg-p2').value = '';
@@ -543,14 +500,14 @@
     }
 
     function switchTab(tabNum) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         document.querySelectorAll('nav .tab').forEach(t => t.classList.remove('active'));
         
-        if (tabNum === 1) document.getElementById('tab1').classList.add('active');
-        else if (tabNum === 2) document.getElementById('tab2').classList.add('active');
-        else if (tabNum === 3) document.getElementById('tab3').classList.add('active');
-        else if (tabNum === 4) document.getElementById('tab4').classList.add('active');
-        else if (tabNum === 5) document.getElementById('tab5').classList.add('active');
+        if (tabNum === 1) document.getElementById('tab1').style.display = 'block';
+        else if (tabNum === 2) document.getElementById('tab2').style.display = 'block';
+        else if (tabNum === 3) document.getElementById('tab3').style.display = 'block';
+        else if (tabNum === 4) document.getElementById('tab4').style.display = 'block';
+        else if (tabNum === 5) document.getElementById('tab5').style.display = 'block';
         
         document.querySelectorAll('nav .tab')[tabNum - 1].classList.add('active');
     }
@@ -656,7 +613,7 @@
         resultsDiv.innerHTML = results.map(user => `
             <div class="user-result" onclick="selectFriendToAdd('${user}')">
                 <img src="${allUsers[user].avatar}" alt="avatar">
-                <div class="user-result-name">${user}</div>
+                <div style="font-size:12px;">${user}</div>
             </div>
         `).join('');
         resultsDiv.style.display = 'block';
@@ -808,8 +765,8 @@
             gameState.privateChatMessages[friendName] = [];
         }
 
-        document.getElementById('tab4').classList.remove('active');
-        document.getElementById('tab4-chat').classList.add('active');
+        document.getElementById('tab4').style.display = 'none';
+        document.getElementById('tab4-chat').style.display = 'block';
         document.getElementById('chat-friend-name').textContent = friendName;
         document.getElementById('chat-friend-avatar').src = allUsers[friendName].avatar;
 
@@ -818,8 +775,8 @@
 
     function backToFriendsList() {
         gameState.currentChatFriend = null;
-        document.getElementById('tab4-chat').classList.remove('active');
-        document.getElementById('tab4').classList.add('active');
+        document.getElementById('tab4-chat').style.display = 'none';
+        document.getElementById('tab4').style.display = 'block';
     }
 
     function displayPrivateChat() {
@@ -873,8 +830,6 @@
         }
     }
 
-    let currentSpinResult = null;
-
     function spin(color) {
         const betAmount = parseFloat(document.getElementById('bet-amt').value);
         
@@ -892,14 +847,12 @@
         const wheel = document.getElementById('wheel');
         wheel.classList.remove('spin');
         
-        // Розраховуємо результат
         const rand = Math.random() * 100;
         let winColor;
         if (rand < 48) winColor = 'red';
         else if (rand < 72) winColor = 'black';
         else winColor = 'green';
 
-        // Розрахунок кута обертання на основі виграшу
         let rotation = 0;
         if (winColor === 'red') {
             rotation = 360 * 10 + Math.random() * 35;
@@ -909,8 +862,6 @@
             rotation = 360 * 10 + 74 + Math.random() * 26;
         }
 
-        currentSpinResult = winColor;
-        
         setTimeout(() => {
             wheel.classList.add('spin');
             wheel.style.transform = `rotate(${rotation}deg)`;
@@ -918,7 +869,7 @@
 
         setTimeout(() => {
             if (winColor === color) {
-                const multiplier = color === 'green' ? 14 : (color === 'red' ? 2 : 2);
+                const multiplier = color === 'green' ? 14 : 2;
                 const winAmount = betAmount * multiplier;
                 gameState.balance += winAmount;
                 alert(`🎉 ВИ ВИГРАЛИ ${winAmount.toFixed(4)} STICK!\n(${winColor.toUpperCase()})`);
@@ -984,9 +935,6 @@
         setupTicTacToe();
     }
 
-    let tttChallengeFriend = null;
-    let tttChallengeBet = 0;
-
     function challengeFriend() {
         const friend = document.getElementById('ttt-friend').value;
         const bet = parseFloat(document.getElementById('ttt-bet').value) || 0;
@@ -1001,97 +949,36 @@
             return;
         }
 
-        tttChallengeFriend = friend;
-        tttChallengeBet = bet;
-
-        if (!allUsers[friend].tttRequests) {
-            allUsers[friend].tttRequests = [];
-        }
-
-        allUsers[friend].tttRequests.push({
-            from: gameState.user,
-            bet: bet,
-            timestamp: Date.now()
-        });
-
-        saveAllUsersToJsonBin();
-        alert(`✓ Запит на гру відправлено до ${friend}!${bet > 0 ? ' На ставку: ' + bet.toFixed(4) + ' STICK' : ''}`);
-        document.getElementById('ttt-bet').value = '';
-        resetTicTacToe();
-    }
-
-    function acceptTTTChallenge() {
-        document.getElementById('ttt-request-modal').classList.remove('active');
-        resetTicTacToe();
-        setupTicTacToe();
-    }
-
-    function rejectTTTChallenge() {
-        document.getElementById('ttt-request-modal').classList.remove('active');
+        alert(`✓ Виклик відправлено користувачу ${friend}!`);
     }
 
     function saveConfig() {
-        const avatarUrl = document.getElementById('avatar-url').value.trim();
-        const username = document.getElementById('username-cfg').value.trim();
-        
-        if (!avatarUrl) {
-            alert('Введіть URL аватару!');
-            return;
+        const newAvatar = document.getElementById('avatar-url').value;
+        if (newAvatar && gameState.user) {
+            allUsers[gameState.user].avatar = newAvatar;
+            document.getElementById('h-a').src = newAvatar;
+            saveAllUsersToJsonBin();
+            alert('✓ Аватар оновлено!');
         }
-        
-        allUsers[gameState.user].avatar = avatarUrl;
-        document.getElementById('h-a').src = avatarUrl;
-        
-        saveAllUsersToJsonBin();
-        alert('✓ Конфіг збережено!');
     }
 
-    function openChangePasswordModal() {
-        document.getElementById('change-password-modal').classList.add('active');
-    }
-
-    function closeChangePasswordModal() {
-        document.getElementById('change-password-modal').classList.remove('active');
-        document.getElementById('old-password').value = '';
-        document.getElementById('new-password').value = '';
-        document.getElementById('new-password-confirm').value = '';
-    }
-
-    function changePassword() {
-        const oldPassword = document.getElementById('old-password').value;
-        const newPassword = document.getElementById('new-password').value;
-        const newPasswordConfirm = document.getElementById('new-password-confirm').value;
-
-        if (!oldPassword || !newPassword || !newPasswordConfirm) {
-            alert('Заповніть всі поля!');
-            return;
-        }
-
-        if (oldPassword !== gameState.password) {
-            alert('Неправильний старий пароль!');
-            return;
-        }
-
-        if (newPassword !== newPasswordConfirm) {
-            alert('Нові паролі не співпадають!');
-            return;
-        }
-
-        if (newPassword.length < 4) {
-            alert('Новий пароль повинен бути не менше 4 символів!');
-            return;
-        }
-
-        gameState.password = newPassword;
-        allUsers[gameState.user].password = newPassword;
-
-        saveAllUsersToJsonBin();
-        alert('✓ Пароль успішно змінено!');
-        closeChangePasswordModal();
+    function saveUserData() {
+        if (!gameState.user) return;
+        allUsers[gameState.user].balance = gameState.balance;
+        allUsers[gameState.user].friends = gameState.friends;
+        allUsers[gameState.user].friendRequests = gameState.friendRequests;
+        allUsers[gameState.user].privateChatMessages = gameState.privateChatMessages;
+        allUsers[gameState.user].mining = gameState.mining;
+        allUsers[gameState.user].miningStartTime = gameState.miningStartTime;
     }
 
     function logout() {
-        if (confirm('Ви впевнені, що хочете вийти?')) {
+        if (confirm('Вы точно хотите выйти?')) {
+            clearInterval(autoSaveInterval);
+            clearInterval(refreshInterval);
+            clearInterval(mineInterval);
+            document.getElementById('auth-scr').style.display = 'flex';
+            document.getElementById('main-scr').style.display = 'none';
             gameState = {
                 user: null,
                 password: null,
@@ -1106,35 +993,9 @@
                 miningStartTime: 0,
                 lastMiningAmount: 0
             };
-
-            clearInterval(autoSaveInterval);
-            clearInterval(refreshInterval);
-            clearInterval(mineInterval);
-
-            document.getElementById('main-scr').style.display = 'none';
-            document.getElementById('auth-scr').style.display = 'flex';
-            
-            document.getElementById('login-u').value = '';
-            document.getElementById('login-p').value = '';
         }
     }
-
-    function saveUserData() {
-        if (!gameState.user || !allUsers[gameState.user]) return;
-        
-        allUsers[gameState.user].balance = gameState.balance;
-        allUsers[gameState.user].mining = gameState.mining;
-        allUsers[gameState.user].miningStartTime = gameState.miningStartTime;
-        allUsers[gameState.user].friends = gameState.friends;
-        allUsers[gameState.user].friendRequests = gameState.friendRequests;
-        allUsers[gameState.user].privateChatMessages = gameState.privateChatMessages;
-    }
-
-    // Ініціалізація при завантаженні
-    window.addEventListener('load', async () => {
-        await loadAllUsers();
-        console.log('✓ Додаток готовий до роботи');
-    });
 </script>
+
 </body>
 </html>
