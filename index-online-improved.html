@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STICK FARM PRO ULTRA v2.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --p: #07FFFF;
+            --bg: #030303;
+            --card: #0d0d0d;
+            --g: #00ff88;
+            --r: #ff3366;
+            --gold: #ffcc00;
+            --black: #1a1a1a;
+            --purple: #9d4edd;
+            --blue: #3a86ff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #030303 0%, #0a0a15 100%);
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .glass {
+            background: rgba(13, 13, 13, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(7, 255, 255, 0.2);
+            margin-bottom: 15px;
+            box-shadow: 0 0 30px rgba(7, 255, 255, 0.1);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(7, 255, 255, 0.3);
+            color: #fff;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--p);
+            box-shadow: 0 0 15px rgba(7, 255, 255, 0.5);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--p) 0%, var(--blue) 100%);
+            color: #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(7, 255, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(7, 255, 255, 0.6);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .header {
+            padding: 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(7, 255, 255, 0.2);
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(13,13,13,0.6) 100%);
+            backdrop-filter: blur(10px);
+            z-index: 40;
+        }
+
+        .header-item {
+            text-align: left;
+        }
+
+        .header-item small {
+            color: rgba(7, 255, 255, 0.6);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-item b {
+            color: var(--p);
+            font-size: 18px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .av {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--p);
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(7, 255, 255, 0.4);
+            cursor: pointer;
+        }
+
+        .view {
+            flex: 1;
+            padding: 20px;
+            display: none;
+            overflow-y: auto;
+            padding-bottom: 90px;
+        }
+
+        .view.active {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            border-top: 2px solid rgba(7, 255, 255, 0.2);
+            padding: 12px 0 25px;
+            z-index: 50;
+        }
+
+        .tab {
+            text-align: center;
+            color: rgba(100, 100, 100, 0.8);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px 5px;
+        }
+
+        .tab:hover {
+            color: var(--p);
+            transform: scale(1.1);
+        }
+
+        .tab.active {
+            color: var(--p);
+            text-shadow: 0 0 10px var(--p);
+        }
+
+        .tab span {
+            display: block;
+            font-size: 8px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* РУЛЕТКА - ПРАВИЛЬНІ РОЗМІРИ */
+        .roulette-wheel {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #ff3366 0deg 172.8deg,
+                #111111 172.8deg 259.2deg,
+                #00ff88 259.2deg 360deg
+            );
+            border: 6px solid var(--p);
+            box-shadow: 0 0 60px rgba(7, 255, 255, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 30px auto;
+            transition: transform 0.1s linear;
+        }
+
+        .roulette-wheel::before {
+            content: '';
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: var(--p);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--p);
+            z-index: 10;
+        }
+
+        .roulette-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid var(--p);
+            filter: drop-shadow(0 0 10px var(--p));
+            z-index: 20;
+        }
+
+        .roulette-wheel.spinning {
+            animation: spin 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(1080deg); }
+        }
+
+        .bet-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            color: white;
+        }
+
+        .bet-btn.red {
+            border-color: var(--r);
+            color: var(--r);
+        }
+
+        .bet-btn.red:hover {
+            background: rgba(255, 51, 102, 0.2);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
+        }
+
+        .bet-btn.black {
+            border-color: #999;
+            color: #999;
+        }
+
+        .bet-btn.black:hover {
+            background: rgba(153, 153, 153, 0.2);
+        }
+
+        .bet-btn.green {
+            border-color: var(--g);
+            color: var(--g);
+        }
+
+        .bet-btn.green:hover {
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        /* ЧАТИ */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 200px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-msg {
+            margin-bottom: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            animation: msgPop 0.3s ease;
+        }
+
+        @keyframes msgPop {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .chat-msg.own {
+            background: rgba(7, 255, 255, 0.2);
+            margin-left: 30px;
+            text-align: right;
+        }
+
+        .chat-msg.other {
+            background: rgba(0, 255, 136, 0.1);
+            margin-right: 30px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--g);
+            color: var(--g);
+            padding: 15px 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            animation: slideInRight 0.4s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .notification.error {
+            border-color: var(--r);
+            color: var(--r);
+            background: rgba(255, 51, 102, 0.1);
+        }
+
+        h3 {
+            color: var(--p);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(7, 255, 255, 0.3);
+            max-width: 350px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--p);
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-group button {
+            flex: 1;
+        }
+
+        @media (max-width: 480px) {
+            .view {
+                padding: 15px;
+                padding-bottom: 100px;
+            }
+
+            .roulette-wheel {
+                width: 200px;
+                height: 200px;
+            }
+
+            .bet-btn {
+                padding: 10px;
+                font-size: 11px;
+            }
+
+            .chat-messages {
+                min-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-scr" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div class="glass" style="width:100%; max-width:380px; text-align:center;">
+        <h2 style="letter-spacing:5px; margin-bottom:30px; font-size:2.2rem; background: linear-gradient(135deg, var(--p), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">STICK<span style="color:var(--p)">FARM</span></h2>
+        
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <button class="btn" id="tab-login" onclick="switchAuth('login')" style="background: linear-gradient(135deg, var(--p), var(--blue)); color:#000;">ВХІД</button>
+            <button class="btn" id="tab-register" onclick="switchAuth('register')" style="background: rgba(7, 255, 255, 0.1); color:var(--p); border: 2px solid rgba(7, 255, 255, 0.3);">РЕЄСТР</button>
+        </div>
+
+        <div id="login-form">
+            <input type="text" id="login-u" placeholder="ЛОГІН">
+            <input type="password" id="login-p" placeholder="ПАРОЛЬ">
+            <button class="btn" onclick="auth('login')" style="margin-top: 15px;">УВІЙТИ</button>
+        </div>
+
+        <div id="register-form" style="display:none;">
+            <input type="text" id="reg-u" placeholder="ЛОГІН">
+            <input type="password" id="reg-p" placeholder="ПАРОЛЬ">
+            <input type="password" id="reg-p2" placeholder="ПОВТОРИТИ">
+            <button class="btn" onclick="auth('register')" style="margin-top: 15px;">РЕЄСТРАЦІЯ</button>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div id="main-scr" style="display:none; flex-direction:column; height:100vh;">
+    <div class="header">
+        <div class="header-item">
+            <small>ОПЕРАТОР</small>
+            <b id="h-u">---</b>
+        </div>
+        <div style="flex:1; text-align: center;">
+            <h1 id="v-bal" style="font-size:2.5rem; margin: 0; background: linear-gradient(135deg, var(--p), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">0.0000</h1>
+        </div>
+        <div class="header-item" style="text-align: right;">
+            <small>БАЛАНС</small>
+            <b id="h-b" style="color:var(--g);">0.0000</b>
+        </div>
+        <img id="h-a" class="av" src="" alt="avatar">
+    </div>
+
+    <!-- MINING TAB -->
+    <div id="tab1" class="view active">
+        <h3 style="text-align:center;">⛏️ РЕЖИМ МАЙНІНГУ</h3>
+        <div id="mbtn" style="width: 200px; height: 200px; border-radius: 50%; border: 5px solid var(--g); margin: 40px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: all 0.3s ease; background: radial-gradient(circle at 30% 30%, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0)); box-shadow: 0 0 40px rgba(0, 255, 136, 0.3); font-size: 18px; color: var(--g); text-align: center; line-height: 1.4;" onclick="toggleMine()">
+            START<br>MINING
+        </div>
+        <div style="text-align:center; font-size:12px; color:rgba(7, 255, 255, 0.6);">+0.0001 STICK/сек</div>
+    </div>
+
+    <!-- TRANSFER TAB -->
+    <div id="tab2" class="view">
+        <h3 style="margin-top:0;">💳 TRANSFER</h3>
+        <div class="glass">
+            <input type="text" id="transfer-user" placeholder="Логін отримувача">
+            <input type="number" id="transfer-amount" placeholder="0.0000" min="0.0001" step="0.0001">
+            <button class="btn" onclick="transferCoins()" style="margin-top: 15px;">ВІДПРАВИТИ</button>
+        </div>
+    </div>
+
+    <!-- CASINO TAB -->
+    <div id="tab3" class="view">
+        <h3 style="margin-top:0;">🎰 КАЗИНО - РУЛЕТКА</h3>
+        <div class="glass">
+            <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="roulette-pointer"></div>
+                <div id="roulette-wheel" class="roulette-wheel"></div>
+            </div>
+            <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <button class="bet-btn red" onclick="spin('red')">🔴 RED<br>48%</button>
+                <button class="bet-btn black" onclick="spin('black')">⚫ BLACK<br>24%</button>
+                <button class="bet-btn green" onclick="spin('green')">🟢 0<br>28%</button>
+            </div>
+        </div>
+
+        <h3>🎮 TIC-TAC-TOE</h3>
+        <div class="glass">
+            <select id="ttt-friend" style="margin: 8px 0;"><option value="">Оберіть друга...</option></select>
+            <input type="number" id="ttt-bet" placeholder="Ставка (0 = просто гра)" min="0" step="0.0001">
+            <button class="btn" onclick="challengeFriend()" style="margin-top:10px;">ВИКЛИКАТИ НА ГРУ</button>
+        </div>
+    </div>
+
+    <!-- FRIENDS TAB -->
+    <div id="tab4" class="view">
+        <h3 style="margin-top:0;">👥 ДРУЗІ</h3>
+        <div style="display:flex; gap:8px; margin-bottom: 15px;">
+            <input type="text" id="f-u" placeholder="Логін..." style="margin: 0;">
+            <button class="btn" style="width:100px;" onclick="sendFriendRequest()">+ ДОДАТИ</button>
+        </div>
+        
+        <h3 style="color:var(--g); font-size: 12px;">📨 ЗАПИТИ</h3>
+        <div id="f-requests"></div>
+        
+        <h3 style="color:var(--g); font-size: 12px;">👥 ДРУЗІ</h3>
+        <div id="f-list"></div>
+    </div>
+
+    <!-- CHAT TAB -->
+    <div id="tab4-chat" class="view">
+        <div style="display: flex; flex-direction: column; height: 100%;">
+            <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(7, 255, 255, 0.3);">
+                <span onclick="backToFriendsList()" style="cursor: pointer; font-size: 18px; margin-right: 10px; color: var(--g);">◀</span>
+                <img id="chat-friend-avatar" src="" alt="avatar" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; border: 2px solid var(--p);">
+                <div style="flex: 1;">
+                    <div id="chat-friend-name" style="font-weight: 900; color: var(--p);">---</div>
+                </div>
+            </div>
+            <div class="chat-messages" id="private-chat-messages"></div>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <input type="text" id="private-msg-in" placeholder="Повідомлення..." onkeypress="handleChatKeypress(event)" style="flex: 1; margin: 0;">
+                <button class="btn" onclick="sendPrivateMsg()" style="width: 70px; margin: 0;">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIG TAB -->
+    <div id="tab5" class="view">
+        <h3 style="margin-top:0;">⚙️ НАЛАШТУВАННЯ</h3>
+        <div class="glass">
+            <input type="text" id="avatar-url" placeholder="URL АВАТАРА">
+            <button class="btn" onclick="saveConfig()" style="margin-top:12px;">ЗБЕРЕГТИ</button>
+            <button class="btn" onclick="logout()" style="background: linear-gradient(135deg, var(--r), #ff6b9d); color:#fff; margin-top:10px;">ВИХІД</button>
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="tab active" onclick="switchTab(1)">⛏️<span>Mining</span></div>
+        <div class="tab" onclick="switchTab(2)">💳<span>Transfer</span></div>
+        <div class="tab" onclick="switchTab(3)">🎰<span>Casino</span></div>
+        <div class="tab" onclick="switchTab(4)">👥<span>Friends</span></div>
+        <div class="tab" onclick="switchTab(5)">⚙️<span>Config</span></div>
+    </nav>
+</div>
+
+<!-- MODALS -->
+<div id="friend-request-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="friend-request-title">ЗАПИТ НА ДРУЖБУ</h2>
+        <p id="friend-request-text" style="color: rgba(200, 200, 200, 0.8); text-align: center;"></p>
+        <div class="btn-group">
+            <button class="btn" style="background: linear-gradient(135deg, var(--g), #00d66a); color:#000;" onclick="acceptFriendRequest()">✓ ПРИЙНЯТИ</button>
+            <button class="btn" style="background: rgba(7, 255, 255, 0.1); color:var(--p); border: 2px solid rgba(7, 255, 255, 0.3);" onclick="rejectFriendRequest()">✕ ВІДХИЛИТИ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const JSONBIN_ID = '6a04f5aaadc21f119a979f14';
+    const JSONBIN_MASTER_KEY = '$2a$10$7yePq6PbDAjjMpk4.gfkWeIOrhlJpxaX7Io9/IM0FevWs37W5eaea';
+    const JSONBIN_API = 'https://api.jsonbin.io/v3/b/' + JSONBIN_ID;
+
+    let allUsers = {};
+    let autoSaveInterval = null;
+    let refreshInterval = null;
+
+    let gameState = {
+        user: null,
+        password: null,
+        balance: 0,
+        mining: false,
+        friends: [],
+        friendRequests: [],
+        privateChatMessages: {},
+        currentChatFriend: null,
+        miningStartTime: 0
+    };
+
+    let mineInterval = null;
+
+    window.addEventListener('load', async () => {
+        await loadAllUsers();
+    });
+
+    async function loadAllUsers() {
+        try {
+            const response = await fetch(JSONBIN_API, {
+                method: 'GET',
+                headers: { 'X-Master-Key': JSONBIN_MASTER_KEY }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                allUsers = data.record || {};
+            } else {
+                allUsers = JSON.parse(localStorage.getItem('stick_users')) || {};
+            }
+        } catch (error) {
+            allUsers = JSON.parse(localStorage.getItem('stick_users')) || {};
+        }
+    }
+
+    async function saveAllUsersToJsonBin() {
+        try {
+            const response = await fetch(JSONBIN_API, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_MASTER_KEY
+                },
+                body: JSON.stringify(allUsers)
+            });
+            if (response.ok) {
+                localStorage.setItem('stick_users', JSON.stringify(allUsers));
+            }
+        } catch (error) {
+            localStorage.setItem('stick_users', JSON.stringify(allUsers));
+        }
+    }
+
+    function showNotification(message, type = 'success') {
+        const notif = document.createElement('div');
+        notif.className = `notification ${type}`;
+        notif.textContent = message;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 4000);
+    }
+
+    function switchAuth(type) {
+        if (type === 'login') {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('tab-login').style.background = 'linear-gradient(135deg, var(--p), var(--blue))';
+            document.getElementById('tab-login').style.color = '#000';
+            document.getElementById('tab-register').style.background = 'rgba(7, 255, 255, 0.1)';
+            document.getElementById('tab-register').style.color = 'var(--p)';
+        } else {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('tab-login').style.background = 'rgba(7, 255, 255, 0.1)';
+            document.getElementById('tab-login').style.color = 'var(--p)';
+            document.getElementById('tab-register').style.background = 'linear-gradient(135deg, var(--p), var(--blue))';
+            document.getElementById('tab-register').style.color = '#000';
+        }
+    }
+
+    async function auth(type) {
+        const username = document.getElementById(type === 'login' ? 'login-u' : 'reg-u').value.trim();
+        const password = document.getElementById(type === 'login' ? 'login-p' : 'reg-p').value;
+
+        if (!username || !password) {
+            showNotification('❌ Заповніть усі поля!', 'error');
+            return;
+        }
+
+        if (type === 'register') {
+            const passwordConfirm = document.getElementById('reg-p2').value;
+            if (password !== passwordConfirm) {
+                showNotification('❌ Паролі не співпадають!', 'error');
+                return;
+            }
+            if (allUsers[username]) {
+                showNotification('❌ Користувач вже існує!', 'error');
+                return;
+            }
+
+            allUsers[username] = {
+                password: password,
+                balance: 0,
+                avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + username,
+                friends: [],
+                friendRequests: [],
+                privateChatMessages: {},
+                mining: false,
+                miningStartTime: 0
+            };
+
+            await saveAllUsersToJsonBin();
+            showNotification('✓ Акаунт створено!', 'success');
+            switchAuth('login');
+        } else {
+            if (!allUsers[username] || allUsers[username].password !== password) {
+                showNotification('❌ Неправильні дані!', 'error');
+                return;
+            }
+
+            gameState.user = username;
+            gameState.password = password;
+            gameState.balance = allUsers[username].balance || 0;
+            gameState.friends = allUsers[username].friends || [];
+            gameState.friendRequests = allUsers[username].friendRequests || [];
+            gameState.privateChatMessages = allUsers[username].privateChatMessages || {};
+
+            document.getElementById('auth-scr').style.display = 'none';
+            document.getElementById('main-scr').style.display = 'flex';
+
+            updateHeader();
+            document.getElementById('h-a').src = allUsers[username].avatar;
+            updateFriendsList();
+            updateFriendRequestsList();
+            startAutoSave();
+            startDataRefresh();
+            startMining();
+
+            showNotification(`✓ Вітаємо, ${username}!`, 'success');
+        }
+    }
+
+    function updateHeader() {
+        document.getElementById('h-u').textContent = gameState.user || '---';
+        document.getElementById('h-b').textContent = gameState.balance.toFixed(4);
+        document.getElementById('v-bal').textContent = gameState.balance.toFixed(4);
+    }
+
+    function switchTab(num) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab' + num).classList.add('active');
+        document.querySelectorAll('.tab')[num - 1].classList.add('active');
+    }
+
+    function startAutoSave() {
+        autoSaveInterval = setInterval(saveUserData, 5000);
+    }
+
+    function startDataRefresh() {
+        refreshInterval = setInterval(() => {
+            if (gameState.user) {
+                loadAllUsers();
+                if (gameState.currentChatFriend) displayPrivateChat();
+                updateFriendsList();
+            }
+        }, 2000);
+    }
+
+    function saveUserData() {
+        if (!gameState.user) return;
+        allUsers[gameState.user].balance = gameState.balance;
+        allUsers[gameState.user].friends = gameState.friends;
+        allUsers[gameState.user].friendRequests = gameState.friendRequests;
+        allUsers[gameState.user].privateChatMessages = gameState.privateChatMessages;
+        allUsers[gameState.user].mining = gameState.mining;
+        allUsers[gameState.user].miningStartTime = gameState.miningStartTime;
+        saveAllUsersToJsonBin();
+    }
+
+    function toggleMine() {
+        const btn = document.getElementById('mbtn');
+        gameState.mining = !gameState.mining;
+
+        if (gameState.mining) {
+            btn.style.borderColor = 'var(--r)';
+            btn.textContent = 'MINING...';
+            gameState.miningStartTime = Date.now();
+            if (mineInterval) clearInterval(mineInterval);
+            mineInterval = setInterval(() => {
+                gameState.balance += 0.0001;
+                updateHeader();
+            }, 1000);
+        } else {
+            btn.style.borderColor = 'var(--g)';
+            btn.textContent = 'START\nMINING';
+            clearInterval(mineInterval);
+        }
+        saveUserData();
+    }
+
+    function startMining() {
+        if (gameState.mining) toggleMine();
+    }
+
+    function sendFriendRequest() {
+        const friendName = document.getElementById('f-u').value.trim();
+        if (!friendName || !allUsers[friendName]) {
+            showNotification('❌ Користувача не існує!', 'error');
+            return;
+        }
+
+        allUsers[friendName].friendRequests = allUsers[friendName].friendRequests || [];
+        allUsers[friendName].friendRequests.push(gameState.user);
+        saveAllUsersToJsonBin();
+        showNotification(`✓ Запит надіслано!`, 'success');
+        document.getElementById('f-u').value = '';
+    }
+
+    function updateFriendRequestsList() {
+        const div = document.getElementById('f-requests');
+        if (gameState.friendRequests.length === 0) {
+            div.innerHTML = '<p style="font-size:11px; color: rgba(200, 200, 200, 0.5);">немає запитів</p>';
+            return;
+        }
+
+        div.innerHTML = gameState.friendRequests.map((friend, idx) => `
+            <div style="background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 10px; margin: 8px 0; display: flex; justify-content: space-between; border: 1px solid rgba(7, 255, 255, 0.2);">
+                <span style="flex: 1;">${friend}</span>
+                <button class="btn" onclick="acceptFriendRequest()" style="width: 50px; padding: 8px; background: var(--g); color: #000; font-size: 10px;">✓</button>
+                <button class="btn" onclick="rejectFriendRequest()" style="width: 50px; padding: 8px; background: var(--r); margin-left: 5px; font-size: 10px;">✕</button>
+            </div>
+        `).join('');
+    }
+
+    function acceptFriendRequest() {
+        const friend = gameState.friendRequests[0];
+        gameState.friends.push(friend);
+        gameState.friendRequests.shift();
+        allUsers[friend].friends = allUsers[friend].friends || [];
+        allUsers[friend].friends.push(gameState.user);
+        saveUserData();
+        updateFriendsList();
+        updateFriendRequestsList();
+    }
+
+    function rejectFriendRequest() {
+        gameState.friendRequests.shift();
+        saveUserData();
+        updateFriendRequestsList();
+    }
+
+    function updateFriendsList() {
+        const listDiv = document.getElementById('f-list');
+        const select = document.getElementById('ttt-friend');
+        listDiv.innerHTML = '';
+        select.innerHTML = '<option value="">Оберіть друга...</option>';
+
+        if (gameState.friends.length === 0) {
+            listDiv.innerHTML = '<p style="font-size:11px; color: rgba(200, 200, 200, 0.5); text-align:center;">немає друзів</p>';
+            return;
+        }
+
+        gameState.friends.forEach(friend => {
+            const div = document.createElement('div');
+            div.style.cssText = 'background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 10px; margin: 8px 0; display: flex; justify-content: space-between; border: 1px solid rgba(7, 255, 255, 0.2); cursor: pointer;';
+            div.onclick = () => openPrivateChat(friend);
+            div.innerHTML = `
+                <span style="flex: 1;">${friend}</span>
+                <button class="btn" style="width: 60px; padding: 8px; font-size: 10px;">💬</button>
+            `;
+            listDiv.appendChild(div);
+
+            const option = document.createElement('option');
+            option.value = friend;
+            option.textContent = friend;
+            select.appendChild(option);
+        });
+    }
+
+    function openPrivateChat(friendName) {
+        gameState.currentChatFriend = friendName;
+        if (!gameState.privateChatMessages[friendName]) {
+            gameState.privateChatMessages[friendName] = [];
+        }
+        document.getElementById('tab4').classList.remove('active');
+        document.getElementById('tab4-chat').classList.add('active');
+        document.getElementById('chat-friend-name').textContent = friendName;
+        document.getElementById('chat-friend-avatar').src = allUsers[friendName].avatar;
+        displayPrivateChat();
+    }
+
+    function backToFriendsList() {
+        gameState.currentChatFriend = null;
+        document.getElementById('tab4-chat').classList.remove('active');
+        document.getElementById('tab4').classList.add('active');
+    }
+
+    function displayPrivateChat() {
+        const chatDiv = document.getElementById('private-chat-messages');
+        chatDiv.innerHTML = '';
+        const messages = gameState.privateChatMessages[gameState.currentChatFriend] || [];
+        messages.forEach(msg => {
+            const msgEl = document.createElement('div');
+            msgEl.className = `chat-msg ${msg.sender === gameState.user ? 'own' : 'other'}`;
+            msgEl.innerHTML = `<small>${msg.sender}</small><br>${msg.text}`;
+            chatDiv.appendChild(msgEl);
+        });
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    function sendPrivateMsg() {
+        const input = document.getElementById('private-msg-in');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        const message = { sender: gameState.user, text: msg, timestamp: Date.now() };
+        gameState.privateChatMessages[gameState.currentChatFriend].push(message);
+
+        allUsers[gameState.currentChatFriend].privateChatMessages = allUsers[gameState.currentChatFriend].privateChatMessages || {};
+        allUsers[gameState.currentChatFriend].privateChatMessages[gameState.user] = allUsers[gameState.currentChatFriend].privateChatMessages[gameState.user] || [];
+        allUsers[gameState.currentChatFriend].privateChatMessages[gameState.user].push(message);
+
+        saveUserData();
+        input.value = '';
+        displayPrivateChat();
+    }
+
+    function handleChatKeypress(event) {
+        if (event.key === 'Enter') {
+            sendPrivateMsg();
+        }
+    }
+
+    function spin(color) {
+        const betAmount = parseFloat(document.getElementById('bet-amt').value);
+        if (!betAmount || betAmount > gameState.balance) {
+            showNotification('❌ Помилка ставки!', 'error');
+            return;
+        }
+
+        gameState.balance -= betAmount;
+        const wheel = document.getElementById('roulette-wheel');
+        const rand = Math.random() * 100;
+        let winColor = rand < 48 ? 'red' : (rand < 72 ? 'black' : 'green');
+
+        wheel.classList.add('spinning');
+        let rotation = Math.random() * 1080;
+        wheel.style.transform = `rotate(${rotation}deg)`;
+
+        setTimeout(() => {
+            wheel.classList.remove('spinning');
+            if (winColor === color) {
+                const winAmount = betAmount * (color === 'green' ? 14 : 2);
+                gameState.balance += winAmount;
+                showNotification(`🎉 ВИГРАЛИ ${winAmount.toFixed(4)}!`, 'success');
+            } else {
+                showNotification(`❌ Програли ${betAmount.toFixed(4)}!`, 'error');
+            }
+            updateHeader();
+            saveUserData();
+        }, 800);
+    }
+
+    function challengeFriend() {
+        showNotification('🎮 Виклик відправлено!', 'success');
+    }
+
+    function transferCoins() {
+        const recipient = document.getElementById('transfer-user').value.trim();
+        const amount = parseFloat(document.getElementById('transfer-amount').value);
+
+        if (!recipient || !amount || amount > gameState.balance) {
+            showNotification('❌ Помилка!', 'error');
+            return;
+        }
+
+        gameState.balance -= amount;
+        allUsers[recipient].balance = (allUsers[recipient].balance || 0) + amount;
+        saveUserData();
+        showNotification(`✓ Надіслано ${amount.toFixed(4)} до ${recipient}!`, 'success');
+        updateHeader();
+    }
+
+    function saveConfig() {
+        showNotification('✓ Збережено!', 'success');
+    }
+
+    function logout() {
+        if (confirm('Вихід?')) {
+            clearInterval(autoSaveInterval);
+            clearInterval(refreshInterval);
+            clearInterval(mineInterval);
+            document.getElementById('auth-scr').style.display = 'flex';
+            document.getElementById('main-scr').style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
