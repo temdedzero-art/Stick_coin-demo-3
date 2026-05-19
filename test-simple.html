@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ВЕРСІЯ: ТЕСТОВА v2026051901 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>STICK COIN - ТЕСТ v1.0</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #030303;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #0d0d0d;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #07FFFF;
+        }
+        h1 {
+            color: #07FFFF;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        .status-box {
+            background: #000;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #333;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .label { color: #888; }
+        .value { color: #00ff88; font-weight: bold; }
+        button {
+            background: #07FFFF;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: 0.3s;
+        }
+        button:hover { transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .info {
+            background: rgba(7, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            border-left: 3px solid #07FFFF;
+        }
+        .success { color: #00ff88; }
+        .error { color: #ff3366; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚙️ STICK COIN TEST</h1>
+    
+    <div class="info">
+        ✓ Це тестова версія v1.0 для перевірки оновлення сайту<br>
+        ✓ Дата завантаження: <span class="success" id="load-date">загружається...</span><br>
+        ✓ Статус GitHub Pages: <span id="status-text">активна</span>
+    </div>
+
+    <div class="status-box">
+        <div class="status-item">
+            <span class="label">Версія файлу:</span>
+            <span class="value">TEST v2026051901</span>
+        </div>
+        <div class="status-item">
+            <span class="label">Кеш статус:</span>
+            <span class="value" id="cache-status">Перевіряється...</span>
+        </div>
+        <div class="status-item">
+            <span class="label">LocalStorage:</span>
+            <span class="value" id="storage-status">Доступна</span>
+        </div>
+        <div class="status-item">
+            <span class="label">Баланс:</span>
+            <span class="value" id="balance-display">0.0000 STICK</span>
+        </div>
+    </div>
+
+    <div class="status-box">
+        <h3 style="color: #07FFFF; margin-top: 0;">Тестові кнопки</h3>
+        <button onclick="addBalance(0.1)">+ 0.1000 STICK</button>
+        <button onclick="addBalance(1)">+ 1.0000 STICK</button>
+        <button onclick="resetBalance()">Скинути баланс</button>
+    </div>
+
+    <div class="status-box">
+        <h3 style="color: #07FFFF; margin-top: 0;">Тест вводу</h3>
+        <input type="text" id="test-input" placeholder="Введіть текст...">
+        <button onclick="testInput()">Зберегти текст</button>
+        <div style="margin-top: 10px; color: #888; font-size: 12px;">
+            Збережено: <span id="saved-text" class="success">—</span>
+        </div>
+    </div>
+
+    <div class="info">
+        <strong>Що це перевіряє:</strong><br>
+        ✓ Завантаження файлу без кешу<br>
+        ✓ JavaScript функціональність<br>
+        ✓ LocalStorage доступ<br>
+        ✓ Інтерактивні елементи<br>
+        ✓ Оновлення интерфейсу
+    </div>
+
+    <div style="margin-top: 30px; padding: 15px; background: #1a1a1a; border-radius: 6px; border: 1px solid #333;">
+        <h3 style="color: #ffcc00; margin-top: 0;">📝 Інструкція</h3>
+        <p style="text-align: left; font-size: 13px; line-height: 1.8;">
+            <strong>Якщо ця сторінка відображається:</strong><br>
+            1. GitHub Pages працює правильно ✓<br>
+            2. Кеш браузера можна очистити<br>
+            3. Оновлення файлів збережені<br><br>
+            
+            <strong>Якщо ви бачите цю версію,</strong> то основний файл `index.html` оновлювався успішно!<br><br>
+            
+            <strong>Наступні кроки:</strong><br>
+            1. Очистити весь кеш браузера (Ctrl+Shift+Del)<br>
+            2. Жорстке оновлення (Ctrl+F5)<br>
+            3. Перевірити у режимі Інкогніто<br>
+            4. Проверити на іншому девайсі
+        </p>
+    </div>
+</div>
+
+<script>
+    // Для перевірки, чи завантажується новий файл
+    document.getElementById('load-date').textContent = new Date().toLocaleString('uk-UA');
+
+    function checkCache() {
+        const cached = localStorage.getItem('test-cache-time');
+        const now = Date.now();
+        const diff = cached ? Math.round((now - parseInt(cached)) / 1000) : 'вперше';
+        document.getElementById('cache-status').textContent = typeof diff === 'number' ? diff + ' сек' : 'Новий';
+        localStorage.setItem('test-cache-time', now.toString());
+    }
+
+    function addBalance(amount) {
+        let balance = parseFloat(localStorage.getItem('test-balance')) || 0;
+        balance += amount;
+        localStorage.setItem('test-balance', balance.toFixed(4));
+        updateBalance();
+    }
+
+    function resetBalance() {
+        localStorage.removeItem('test-balance');
+        updateBalance();
+        alert('✓ Баланс скинутий!');
+    }
+
+    function updateBalance() {
+        const balance = localStorage.getItem('test-balance') || '0.0000';
+        document.getElementById('balance-display').textContent = parseFloat(balance).toFixed(4) + ' STICK';
+    }
+
+    function testInput() {
+        const input = document.getElementById('test-input').value;
+        if (!input) {
+            alert('Введіть текст!');
+            return;
+        }
+        localStorage.setItem('test-text', input);
+        document.getElementById('saved-text').textContent = input;
+        alert('✓ Текст збережено в LocalStorage!');
+    }
+
+    // Ініціалізація
+    window.addEventListener('load', () => {
+        checkCache();
+        updateBalance();
+        const saved = localStorage.getItem('test-text');
+        if (saved) {
+            document.getElementById('saved-text').textContent = saved;
+        }
+    });
+
+    // Вивідити в консоль
+    console.log('%c=== STICK COIN TEST v2026051901 ===', 'color: #07FFFF; font-size: 16px; font-weight: bold;');
+    console.log('%cФайл успішно завантажено!', 'color: #00ff88; font-size: 14px;');
+    console.log('Дата/час:', new Date().toLocaleString('uk-UA'));
+    console.log('URL:', window.location.href);
+</script>
+
+</body>
+</html>
